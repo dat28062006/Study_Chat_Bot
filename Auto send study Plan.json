@@ -1,0 +1,157 @@
+{
+  "name": "Auto send study Plan",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eeb3aeb3-f61c-4d10-a5c1-676c7b6e0812",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e8d44db9-b4ac-416b-ba05-44c1ff6d4f91",
+      "name": "Webhook",
+      "webhookId": "eeb3aeb3-f61c-4d10-a5c1-676c7b6e0812"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.schedule",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3c7d9eac-9324-4912-a635-79e7d02d3328",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.to_email }}\n",
+        "subject": "={{ $('Webhook').item.json.body.subject }} - Ngày {{ $json.ngay }}: {{ $json.chu_de }}\n",
+        "message": "=<div style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto;\">\n  <h2 style=\"color: #2c3e50; text-align: center;\">📅 Lịch trình học tập - Ngày {{ $json.ngay }}</h2>\n  <p>Chào bạn,</p>\n  <p>Hôm nay chúng ta sẽ bắt tay vào học chủ đề mới:</p>\n  \n  <h3 style=\"color: #2980b9;\">📚 Chủ đề: {{ $json.chu_de }}</h3>\n\n  <!-- 1. KHUNG MỤC TIÊU -->\n  <div style=\"background-color: #e8f4f8; padding: 15px; border-left: 4px solid #17a2b8; margin-bottom: 20px;\">\n    <h4 style=\"margin-top: 0; color: #117a8b;\">🎯 Mục tiêu bài học</h4>\n    <div>\n      {{ $json.muc_tieu }}\n    </div>\n  </div>\n\n  <!-- 2. KHUNG TÀI LIỆU HỌC TẬP -->\n  <div style=\"background-color: #f8f9fa; padding: 15px; border-left: 4px solid #28a745; margin-bottom: 20px;\">\n    <h4 style=\"margin-top: 0; color: #28a745;\">📖 Giáo trình & Bài giảng</h4>\n    \n    <p style=\"margin-bottom: 5px;\">\n      • <strong>Tài liệu:</strong> \n      <a href=\"{{ $json.tai_lieu }}\" target=\"_blank\" style=\"color: #007bff; text-decoration: none;\">\n        {{ $json.chu_de }}\n      </a>\n    </p>\n    \n    <p style=\"margin-top: 0;\">\n      • <strong>Video:</strong> \n      <a href=\"{{ $json.video }}\" target=\"_blank\" style=\"color: #dc3545; font-weight: bold; text-decoration: none;\">\n        ▶️ Bài giảng: {{ $json.chu_de }}\n      </a>\n    </p>\n  </div>\n\n  <!-- 3. KHUNG BÀI TẬP -->\n  <div style=\"background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin-bottom: 20px;\">\n    <h4 style=\"margin-top: 0; color: #856404;\">✍️ Bài tập hôm nay</h4>\n    <div>\n      {{ $json.bai_tap }}\n    </div>\n    \n    <p style=\"margin-top: 15px;\">\n      <strong>🔗 Link nộp bài tập:</strong> \n      <a href=\"https://link-nop-bai-cua-ban.com\" style=\"color: #007bff; font-weight: bold;\">Nộp bài tại đây</a>\n    </p>\n  </div>\n\n  <p>Chúc bạn có một ngày học tập thật hiệu quả! Cố lên nhé! 🔥</p>\n  \n  <br>\n  <hr style=\"border: none; border-top: 1px solid #eee;\">\n  <br>\n\n  <!-- PHẦN UN-SUBSCRIBE Ở CUỐI CÙNG -->\n  <p style=\"font-size: 12px; color: #777; text-align: center;\">\n    Bạn nhận được email này vì đã đăng ký lộ trình học tập của chúng tôi.<br>\n    Nếu bạn không muốn nhận thông báo nữa, \n    <a href=\"mailto:dat28062006@gmail.com?subject=Yêu cầu hủy đăng ký&body=Chào bạn,%0D%0ATôi không muốn nhận thông báo nữa. Vui lòng xóa email này ra khỏi danh sách.%0D%0ACảm ơn!\" style=\"color: #007bff; text-decoration: underline;\">\n      ấn vào đây\n    </a>.\n  </p>\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        144
+      ],
+      "id": "a69272f8-2a02-4e75-a8ab-09250a149c20",
+      "name": "Send a message",
+      "webhookId": "e4733dcf-c0ab-442c-b1a4-01ff39c70349",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NzK6NZ1q0gyd2UC5",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d790ba19-1114-4f10-b7a8-e469502056cf",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        144
+      ],
+      "id": "5d6a3760-f4f9-4234-9033-cb78b3d73b8a",
+      "name": "Wait",
+      "webhookId": "9222fc0c-2f59-4b6a-8ea4-58ea9aa6b473"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "99109862-318f-412c-b546-41490eda5525",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5c0f213570b3be8ee8dc3de08c2767b5bfa4d9e07b141698ad346eefa3f9471e"
+  },
+  "id": "RYVcZRIBnTdkCtPT",
+  "tags": []
+}
